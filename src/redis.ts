@@ -1,21 +1,17 @@
 import Redis from 'ioredis';
+export class RedisMethods {
+  private redis: Redis;
 
-const redis = new Redis();
+  constructor() {
+    this.redis = new Redis();
+  }
 
-// const redis = new Redis({
-//     host: process.env.REDIS_HOST || "localhost",
-//     port: process.env.REDIS_HOST || 6379,
-//     keyPrefix: "cache:"
+  async get(key: string): Promise<string> {
+    const value = await this.redis.get(key);
+    return value ? JSON.parse(value) : null;
+  }
 
-// });
-
-async function get(key: string) {
-  const value = await redis.get(key);
-  return value ? JSON.parse(value) : null;
+  set(key: string, value: object): Promise<string> {
+    return this.redis.set(key, JSON.stringify(value));
+  }
 }
-
-function set(key: string, value: object) {
-  return redis.set(key, JSON.stringify(value));
-}
-
-export { redis };

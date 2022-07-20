@@ -1,28 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { Customers } from './customers';
-import { redis } from '../redis';
+import { RedisMethods } from '../redis';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class CustomersService {
+  constructor(private readonly redis: RedisMethods) {}
+
   create(customer: Customers) {
     const customers = {
       id: uuidv4(),
       document: customer.document,
       name: customer.name,
     };
-    // alterar value do set
-    redis.set(customer.id, customer.name);
+    this.redis.set(customer.id, customers);
     return customers;
   }
 
-  updateCustomer(customer: Customers): string {
-    return;
+  async updateCustomer(customer: Customers, customers: Customers) {
+    this.redis.get(customer.id);
+    this.redis.set(customer.id, customers);
+
+    return customers;
   }
 
-  getById(id: string) {
-    const customer = redis.get(id);
-    return customer;
+  getById(customer: Customers) {
+    return this.redis.get(customer.id);
   }
 
   authToken(): string {
