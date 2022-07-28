@@ -1,29 +1,50 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { Customers } from './customers';
+import { CustomersDto } from '../dto/customers.dto';
 
 @Controller('customers')
 export class CustomersController {
   constructor(private readonly customerService: CustomersService) {}
 
   @Post()
-  async create(@Body() customer: Customers): Promise<Customers> {
+  async create(@Body() customer: CustomersDto): Promise<Customers> {
     return this.customerService.create(customer);
   }
 
   @Put(':id')
-  async updateCustomers(
-    @Param('id') id: Customers,
-    @Body() customer: Customers,
+  async updateCustomer(
+    //validando se é um UUID com ParseUUIDPipe()
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() customer: CustomersDto,
   ) {
-    await this.customerService.updateCustomer(id, customer);
+    this.customerService.updateCustomer(customer);
 
     return customer;
   }
 
   @Get(':id')
-  async getById(@Param('id') customer: Customers): Promise<string> {
+  getById(
+    @Param('id', new ParseUUIDPipe()) customer: Customers,
+  ): Promise<string> {
     return this.customerService.getById(customer);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async destroy(@Param('id', new ParseUUIDPipe()) customer: Customers) {
+    await this.customerService.destroy(customer);
   }
 
   @Post()

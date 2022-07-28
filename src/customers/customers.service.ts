@@ -1,13 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Customers } from './customers';
 import { RedisMethods } from '../redis';
 import { v4 as uuidv4 } from 'uuid';
+import { CustomersDto } from 'src/dto/customers.dto';
 
 @Injectable()
 export class CustomersService {
   constructor(private readonly redis: RedisMethods) {}
 
-  create(customer: Customers) {
+  create(customer: CustomersDto): CustomersDto {
     const customers = {
       id: uuidv4(),
       document: customer.document,
@@ -17,15 +18,26 @@ export class CustomersService {
     return customers;
   }
 
-  async updateCustomer(customer: Customers, customers: Customers) {
+  async updateCustomer(customer: CustomersDto) {
     this.redis.get(customer.id);
-    this.redis.set(customer.id, customers);
 
-    return customers;
+    const { document, name } = customer;
+    customer.name = name;
+    customer.document = document;
+
+    return this.redis.set(customer.id, customer);
   }
 
   getById(customer: Customers) {
-    return this.redis.get(customer.id);
+    try {
+      return this.redis.get(customer.id);
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+  }
+
+  destroy(customer: Customers) {
+    return this.redis.del(customer.id);
   }
 
   authToken(): string {

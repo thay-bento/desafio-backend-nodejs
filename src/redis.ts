@@ -14,4 +14,8 @@ export class RedisMethods {
   set(key: string, value: object): Promise<string> {
     return this.redis.set(key, JSON.stringify(value));
   }
+
+  del(key: string) {
+    return this.redis.del(key);
+  }
 }
