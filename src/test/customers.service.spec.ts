@@ -46,6 +46,17 @@ describe('CustomersService', () => {
       const result = customersService.create(data);
       expect(result).toEqual(customerEntity);
     });
+    it('should throw an exception', () => {
+      jest
+        .spyOn<any, any>(customersService, 'create')
+        .mockImplementation((): any => {
+          throw new Error();
+        });
+
+      expect(() => {
+        customersService.create(data);
+      }).toThrow(new Error());
+    });
   });
   describe('updateCustomer', () => {
     it('should update the informations about a customer successfully', async () => {
