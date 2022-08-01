@@ -6,32 +6,22 @@ import { decode } from 'jsonwebtoken';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  client: AxiosInstance;
-  constructor(private readonly reflector: Reflector) {
-    this.client = axios.create({
-      baseURL: process.env.KEYCLOAK_SERVER_URL,
-    });
-  }
-  private buildHeader(token: string) {
-    return {
-      headers: {
-        Authorization: token,
-      },
-    };
-  }
+  constructor(private readonly reflector: Reflector) {}
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    require('dotenv/config');
-
     const request = context.switchToHttp().getRequest();
     const roles = this.reflector.get<string[]>('roles', context.getHandler());
     const token = request.headers.authorization;
 
-    return this.client
+    return axios
       .get(
-        `/realms/careers/protocol/openid-connect/userinfo`,
-        this.buildHeader(token),
+        'https://accounts.seguros.vitta.com.br/auth/realms/careers/protocol/openid-connect/userinfo',
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       )
       .then(() => {
         //verificação de roles válidas
