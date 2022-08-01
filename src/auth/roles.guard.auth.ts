@@ -1,7 +1,7 @@
 import { Injectable, ExecutionContext, CanActivate } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
 import { decode } from 'jsonwebtoken';
 
 @Injectable()
@@ -13,16 +13,14 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const roles = this.reflector.get<string[]>('roles', context.getHandler());
     const token = request.headers.authorization;
+    const baseURL = process.env.KEYCLOAK_SERVER_URL;
 
     return axios
-      .get(
-        'https://accounts.seguros.vitta.com.br/auth/realms/careers/protocol/openid-connect/userinfo',
-        {
-          headers: {
-            Authorization: token,
-          },
+      .get(`${baseURL}/auth/realms/careers/protocol/openid-connect/userinfo`, {
+        headers: {
+          Authorization: token,
         },
-      )
+      })
       .then(() => {
         //verificação de roles válidas
         const decodedToken: any = decode(token.split(' ')[1]);

@@ -1,5 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Customers } from './customers';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { RedisMethods } from '../cache/redis';
 import { v4 as uuidv4 } from 'uuid';
 import { CustomersDto } from 'src/dto/customers.dto';
@@ -14,33 +13,29 @@ export class CustomersService {
       document: customer.document,
       name: customer.name,
     };
-    this.redis.set(customer.id, customers);
+    this.redis.set(customers.id, customers);
     return customers;
   }
 
-  async updateCustomer(customer: CustomersDto) {
-    this.redis.get(customer.id);
+  async updateCustomer(id: string, customer: CustomersDto) {
+    const getID = await this.redis.get(id);
+
+    if (!getID) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
 
     const { document, name } = customer;
-    customer.name = name;
-    customer.document = document;
+    getID.document = document;
+    getID.name = name;
 
-    return this.redis.set(customer.id, customer);
+    this.redis.set(id, getID);
+
+    return getID;
   }
 
-  getById(customer: Customers) {
-    try {
-      return this.redis.get(customer.id);
-    } catch (error) {
-      throw new NotFoundException(error.message);
-    }
+  async getById(id: string) {
+    return await this.redis.get(id);
   }
 
-  destroy(customer: Customers) {
-    return this.redis.del(customer.id);
-  }
-
-  authToken(): string {
-    return;
+  destroy(id: string) {
+    return this.redis.del(id);
   }
 }

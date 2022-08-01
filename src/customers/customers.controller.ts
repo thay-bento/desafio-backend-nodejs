@@ -3,7 +3,7 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
+  HttpException,
   HttpStatus,
   Param,
   ParseUUIDPipe,
@@ -31,32 +31,28 @@ export class CustomersController {
   @Put(':id')
   @SetMetadata('roles', ['admin', 'user'])
   async updateCustomer(
-    //validando se é um UUID com ParseUUIDPipe()
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() customer: CustomersDto,
   ) {
-    this.customerService.updateCustomer(customer);
-
-    return customer;
+    return await this.customerService.updateCustomer(id, customer);
   }
 
   @Get(':id')
   @SetMetadata('roles', ['admin', 'user'])
-  getById(
-    @Param('id', new ParseUUIDPipe()) customer: Customers,
-  ): Promise<string> {
-    return this.customerService.getById(customer);
+  async getById(@Param('id', new ParseUUIDPipe()) id: string) {
+    const getCustomer = await this.customerService.getById(id);
+    if (!getCustomer)
+      throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+
+    return getCustomer;
   }
 
   @Delete(':id')
   @SetMetadata('roles', ['admin', 'user'])
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async destroy(@Param('id', new ParseUUIDPipe()) customer: Customers) {
-    await this.customerService.destroy(customer);
-  }
+  async destroy(@Param('id', new ParseUUIDPipe()) id: string) {
+    const destroyCustomer = await this.customerService.destroy(id);
 
-  @Post()
-  authToken() {
-    return;
+    if (!destroyCustomer)
+      throw new HttpException('Customer NOT FOUND!!', HttpStatus.NOT_FOUND);
   }
 }
