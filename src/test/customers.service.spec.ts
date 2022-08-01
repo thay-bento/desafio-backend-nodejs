@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Customers } from '../customers/customers';
-import { RedisMethods } from '../redis';
+import { RedisMethods } from '../cache/redis';
 import { CustomersService } from '../customers/customers.service';
 import { CustomersDto } from 'src/dto/customers.dto';
 

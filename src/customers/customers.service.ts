@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Customers } from './customers';
-import { RedisMethods } from '../redis';
+import { RedisMethods } from '../cache/redis';
 import { v4 as uuidv4 } from 'uuid';
 import { CustomersDto } from 'src/dto/customers.dto';
 
