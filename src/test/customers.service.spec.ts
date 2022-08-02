@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Customers } from '../customers/customers';
 import { RedisMethods } from '../cache/redis';
 import { CustomersService } from '../customers/customers.service';
-import { CustomersDto } from 'src/dto/customers.dto';
+import { CreateCustomersDto } from 'src/dto/CreateCustomers.dto';
 
 const customerEntity: Customers = {
   id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',
@@ -36,7 +36,7 @@ describe('CustomersService', () => {
   });
 
   describe('create', () => {
-    const data: CustomersDto = {
+    const data: CreateCustomersDto = {
       id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',
       document: 123456,
       name: 'Maria',
@@ -70,7 +70,7 @@ describe('CustomersService', () => {
       jest
         .spyOn(customersService, 'updateCustomer')
         .mockRejectedValueOnce(new Error());
-      const data: CustomersDto = {
+      const data: CreateCustomersDto = {
         id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',
         document: 223344,
         name: 'Mary',

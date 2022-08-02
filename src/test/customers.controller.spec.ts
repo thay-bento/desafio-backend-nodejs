@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CustomersDto } from 'src/dto/customers.dto';
+import { CreateCustomersDto } from 'src/dto/CreateCustomers.dto';
 import { RedisMethods } from '../cache/redis';
 import { Customers } from '../customers/customers';
 import { CustomersController } from '../customers/customers.controller';
@@ -45,7 +45,7 @@ describe('CustomersController', () => {
   });
 
   describe('create', () => {
-    const body: CustomersDto = {
+    const body: CreateCustomersDto = {
       id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',
       document: 123456,
       name: 'Maria',
@@ -66,7 +66,7 @@ describe('CustomersController', () => {
     });
   });
   describe('updateCustomer', () => {
-    const body: CustomersDto = {
+    const body: CreateCustomersDto = {
       id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',
       document: 223344,
       name: 'Maria do Código',
@@ -91,7 +91,7 @@ describe('CustomersController', () => {
 
   describe('getById', () => {
     it('should get a customer successfully', async () => {
-      const body: Customers = {
+      const body: string = {
         id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',
         document: 123456,
         name: 'Maria',
