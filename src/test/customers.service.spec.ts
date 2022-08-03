@@ -3,14 +3,17 @@ import { Customers } from '../customers/customers';
 import { RedisMethods } from '../cache/redis';
 import { CustomersService } from '../customers/customers.service';
 import { CreateCustomersDto } from '../dto/CreateCustomers.dto';
-import { uuid } from 'uuidv4';
 
 const customerEntity: Customers = {
   id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',
   document: 123456,
   name: 'Maria',
 };
-
+const updatedCustomerEntity: CreateCustomersDto = {
+  id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',
+  document: 223344,
+  name: 'Mary',
+};
 describe('CustomersService', () => {
   let customersService: CustomersService;
   let redis: RedisMethods;
@@ -26,17 +29,14 @@ describe('CustomersService', () => {
   });
 
   describe('create', () => {
-    const data: CreateCustomersDto = {
-      id: uuid(),
-      document: 123456,
-      name: 'Maria',
-    };
     it('should create a new customer successfully', async () => {
-      jest.spyOn(customersService, 'create').mockImplementation(() => data);
+      jest
+        .spyOn(customersService, 'create')
+        .mockImplementation(() => customerEntity);
 
-      const result = customersService.create(data);
+      const result = customersService.create(customerEntity);
 
-      expect(result).toEqual(data);
+      expect(result).toEqual(customerEntity);
     });
 
     it('should throw an exception', () => {
@@ -45,29 +45,27 @@ describe('CustomersService', () => {
       });
 
       expect(() => {
-        customersService.create(data);
+        customersService.create(customerEntity);
       }).toThrow(new Error());
     });
   });
   describe('updateCustomer', () => {
-    const data: CreateCustomersDto = {
-      id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',
-      document: 223344,
-      name: 'Mary',
-    };
     it('should update the informations about a customer successfully', async () => {
       jest.spyOn(redis, 'get').mockResolvedValueOnce(customerEntity);
       const result = await customersService.updateCustomer(
         customerEntity.id,
-        data,
+        updatedCustomerEntity,
       );
-      expect(result).toEqual(data);
+      expect(result).toEqual(updatedCustomerEntity);
     });
     it('should throw a not found exception', () => {
       jest.spyOn(redis, 'get').mockRejectedValueOnce(new Error());
       jest.spyOn(redis, 'set').mockRejectedValueOnce(new Error());
       expect(
-        customersService.updateCustomer(data.id, data),
+        customersService.updateCustomer(
+          updatedCustomerEntity.id,
+          updatedCustomerEntity,
+        ),
       ).rejects.toThrowError();
     });
   });

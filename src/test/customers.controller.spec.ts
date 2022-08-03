@@ -4,7 +4,6 @@ import { RedisMethods } from '../cache/redis';
 import { Customers } from '../customers/customers';
 import { CustomersController } from '../customers/customers.controller';
 import { CustomersService } from '../customers/customers.service';
-import { HttpStatus } from '@nestjs/common';
 
 const customerEntity: Customers = {
   id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',
@@ -51,15 +50,10 @@ describe('CustomersController', () => {
         .spyOn(customersController, 'create')
         .mockRejectedValueOnce(new Error());
 
-      expect(customersController.create(body)).rejects.toThrowError();
+      expect(customersController.create(customerEntity)).rejects.toThrowError();
     });
   });
   describe('updateCustomer', () => {
-    const body: CreateCustomersDto = {
-      id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',
-      document: 223344,
-      name: 'Mary',
-    };
     it('should update the informations about a customer successfully', async () => {
       jest
         .spyOn(customersService, 'updateCustomer')
@@ -76,7 +70,10 @@ describe('CustomersController', () => {
         .spyOn(customersController, 'updateCustomer')
         .mockImplementation(() => Promise.reject(new Error('Not found!')));
       const expectTeste = async () => {
-        await customersController.updateCustomer(body.id, body);
+        await customersController.updateCustomer(
+          customerEntity.id,
+          customerEntity,
+        );
       };
       expect(expectTeste).rejects.toThrow(Error);
     });
