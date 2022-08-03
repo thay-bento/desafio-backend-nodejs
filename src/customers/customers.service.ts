@@ -1,7 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { RedisMethods } from '../cache/redis';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateCustomersDto } from 'src/dto/CreateCustomers.dto';
+import { CreateCustomersDto } from '../dto/CreateCustomers.dto';
+import { Customers } from './customers';
 
 @Injectable()
 export class CustomersService {
@@ -17,7 +18,7 @@ export class CustomersService {
     return customers;
   }
 
-  async updateCustomer(id: string, customer: CreateCustomersDto) {
+  async updateCustomer(id: string, customer: CreateCustomersDto): Promise<any> {
     const getID = await this.redis.get(id);
 
     if (!getID) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
@@ -31,11 +32,11 @@ export class CustomersService {
     return getID;
   }
 
-  async getById(id: string) {
+  async getById(id: string): Promise<Customers> {
     return await this.redis.get(id);
   }
 
-  destroy(id: string) {
+  destroy(id: string): Promise<number> {
     return this.redis.del(id);
   }
 }

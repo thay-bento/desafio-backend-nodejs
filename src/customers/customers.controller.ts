@@ -20,7 +20,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CustomerSwagger } from '../swagger/customer.swagger';
 import { BadRequestSwagger } from '../helpers/swagger/bad-request.swagger';
 import { NotFoundSwagger } from '../helpers/swagger/not-found.swagger';
-import { ForbbidenResourceSwagger } from 'src/helpers/swagger/forbidden-resource.swagger';
+import { ForbbidenResourceSwagger } from '../helpers/swagger/forbidden-resource.swagger';
 
 @Controller('customers')
 @UseGuards(RolesGuard)

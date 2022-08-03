@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CreateCustomersDto } from 'src/dto/CreateCustomers.dto';
+import { CreateCustomersDto } from '../dto/CreateCustomers.dto';
 import { RedisMethods } from '../cache/redis';
 import { Customers } from '../customers/customers';
 import { CustomersController } from '../customers/customers.controller';
 import { CustomersService } from '../customers/customers.service';
+import { HttpStatus } from '@nestjs/common';
 
 const customerEntity: Customers = {
   id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',
@@ -13,7 +14,7 @@ const customerEntity: Customers = {
 const updatedCustomerEntity: Customers = {
   id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',
   document: 223344,
-  name: 'Maria do Código',
+  name: 'Mary',
 };
 describe('CustomersController', () => {
   let customersService: CustomersService;
@@ -22,19 +23,7 @@ describe('CustomersController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CustomersController],
-      providers: [
-        RedisMethods,
-        CustomersService,
-        {
-          provide: CustomersService,
-          useValue: {
-            create: jest.fn().mockResolvedValue(customerEntity),
-            getById: jest.fn().mockResolvedValue(customerEntity),
-            updateCustomer: jest.fn().mockResolvedValue(customerEntity),
-            destroy: jest.fn().mockResolvedValue(customerEntity),
-          },
-        },
-      ],
+      providers: [RedisMethods, CustomersService],
     }).compile();
     customersService = await module.resolve(CustomersService);
     customersController = await module.resolve(CustomersController);
@@ -69,12 +58,16 @@ describe('CustomersController', () => {
     const body: CreateCustomersDto = {
       id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',
       document: 223344,
-      name: 'Maria do Código',
+      name: 'Mary',
     };
     it('should update the informations about a customer successfully', async () => {
+      jest
+        .spyOn(customersService, 'updateCustomer')
+        .mockResolvedValueOnce(updatedCustomerEntity);
+
       const result = await customersController.updateCustomer(
         customerEntity.id,
-        body,
+        updatedCustomerEntity,
       );
       expect(result).toEqual(updatedCustomerEntity);
     });
@@ -91,12 +84,12 @@ describe('CustomersController', () => {
 
   describe('getById', () => {
     it('should get a customer successfully', async () => {
-      const body: string = {
-        id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',
-        document: 123456,
-        name: 'Maria',
-      };
-      const result = await customersController.getById(body);
+      jest
+        .spyOn(customersService, 'getById')
+        .mockResolvedValueOnce(customerEntity);
+      const id = 'db2238ac-d1a2-499e-9a52-c167ac3efa56';
+
+      const result = await customersController.getById(id);
       expect(result).toEqual(customerEntity);
     });
 
@@ -105,15 +98,19 @@ describe('CustomersController', () => {
         .spyOn(customersService, 'getById')
         .mockRejectedValueOnce(new Error('Error'));
       expect(
-        customersController.getById(customerEntity),
+        customersController.getById(customerEntity.id),
       ).rejects.toThrowError();
     });
   });
 
   describe('destroy', () => {
     it('should remove a customer successfully by ID', async () => {
-      const result = await customersController.destroy(customerEntity);
-      expect(result).toBeUndefined();
+      jest.spyOn(customersService, 'destroy').mockImplementation();
+      const callDestroy = async () => {
+        await customersController.destroy(customerEntity.id);
+      };
+
+      expect(callDestroy).rejects.toThrowError();
     });
     it('should throw an exception', () => {
       jest
