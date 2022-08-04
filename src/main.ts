@@ -15,10 +15,11 @@ async function bootstrap() {
     .setTitle('Customer API - Desafio Backend NodeJs ')
     .setDescription('RESTful API')
     .setVersion('1.0')
-    .addTag('customer')
+    .addBearerAuth()
+    .addTag('RESTful API')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('customers/swagger', app, document);
+  SwaggerModule.setup('swagger', app, document);
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

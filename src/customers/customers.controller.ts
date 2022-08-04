@@ -16,13 +16,20 @@ import { CustomersService } from './customers.service';
 import { Customers } from './customers';
 import { CreateCustomersDto } from '../dto/CreateCustomers.dto';
 import { RolesGuard } from '../auth/roles.guard.auth';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { CustomerSwagger } from '../swagger/customer.swagger';
 import { BadRequestSwagger } from '../helpers/swagger/bad-request.swagger';
 import { NotFoundSwagger } from '../helpers/swagger/not-found.swagger';
 import { ForbbidenResourceSwagger } from '../helpers/swagger/forbidden-resource.swagger';
 
 @Controller('customers')
+@ApiBearerAuth()
 @UseGuards(RolesGuard)
 @ApiTags('Customers')
 export class CustomersController {
@@ -31,6 +38,7 @@ export class CustomersController {
   @Post()
   @SetMetadata('roles', ['admin', 'user'])
   @ApiOperation({ summary: 'Create a new customer' })
+  @ApiUnauthorizedResponse()
   @ApiResponse({
     status: 200,
     description: 'Created new customer',
