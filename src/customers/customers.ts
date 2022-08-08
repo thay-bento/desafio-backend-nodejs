@@ -1,13 +1,9 @@
-export class Customers {
+import { Document } from 'mongoose';
+
+export class Customers extends Document {
   id: string;
 
   document: number;
 
   name: string;
-
-  constructor(customer?: Customers) {
-    this.id = customer?.id;
-    this.document = customer.document;
-    this.name = customer.name;
-  }
 }
