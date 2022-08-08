@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Customers } from '../customers/customers';
 import { RedisMethods } from '../cache/redis';
 import { CustomersService } from '../customers/customers.service';
-import { CreateCustomersDto } from '../dto/CreateCustomers.dto';
+import { CreateCustomersDto } from '../customers/dto/CreateCustomers.dto';
 
 const customerEntity: Customers = {
   id: 'db2238ac-d1a2-499e-9a52-c167ac3efa56',

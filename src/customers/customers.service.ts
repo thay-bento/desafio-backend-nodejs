@@ -1,42 +1,40 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { RedisMethods } from '../cache/redis';
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateCustomersDto } from '../dto/CreateCustomers.dto';
-import { Customers } from './customers';
+import { Customer, CustomerDocument } from 'src/schemas/customer.schema';
+import { CreateCustomersDto } from './dto/create-customer.dto';
+import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Injectable()
 export class CustomersService {
-  constructor(private readonly redis: RedisMethods) {}
+  constructor(
+    @InjectModel(Customer.name) private customerModel: Model<CustomerDocument>,
+  ) {}
 
-  create(customer: CreateCustomersDto): CreateCustomersDto {
+  async create(customer: CreateCustomersDto) {
     const customers = {
       id: uuidv4(),
       document: customer.document,
       name: customer.name,
     };
-    this.redis.set(customers.id, customers);
-    return customers;
+    const createdCustomer = new this.customerModel(customers);
+    return await createdCustomer.save();
   }
 
-  async updateCustomer(id: string, customer: CreateCustomersDto): Promise<any> {
-    const getID = await this.redis.get(id);
-
-    if (!getID) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
-
-    const { document, name } = customer;
-    getID.document = document;
-    getID.name = name;
-
-    this.redis.set(id, getID);
-
-    return getID;
+  async getAll() {
+    return await this.customerModel.find().exec();
   }
 
-  async getById(id: string): Promise<Customers> {
-    return await this.redis.get(id);
+  async getById(id: string) {
+    return await this.customerModel.findById(id).exec();
   }
 
-  destroy(id: string): Promise<number> {
-    return this.redis.del(id);
+  async update(id: string, updateCustomerDto: UpdateCustomerDto) {
+    return await this.customerModel.findByIdAndUpdate(id, updateCustomerDto);
+  }
+
+  async destroy(id: string) {
+    return await this.customerModel.deleteOne({ id: id }).exec();
   }
 }

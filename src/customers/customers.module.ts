@@ -1,12 +1,16 @@
 import { Module } from '@nestjs/common';
-import { CreateCustomersDto } from '../dto/CreateCustomers.dto';
-import { RedisMethods } from '../cache/redis';
-import { CustomersController } from './customers.controller';
 import { CustomersService } from './customers.service';
-import { ConfigModule } from '@nestjs/config';
+import { CustomersController } from './customers.controller';
+import { Customer, CustomerSchema } from 'src/schemas/customer.schema';
+import { MongooseModule } from '@nestjs/mongoose';
+
 @Module({
-  imports: [CreateCustomersDto, ConfigModule.forRoot({ isGlobal: true })],
+  imports: [
+    MongooseModule.forFeature([
+      { name: Customer.name, schema: CustomerSchema },
+    ]),
+  ],
   controllers: [CustomersController],
-  providers: [CustomersService, RedisMethods],
+  providers: [CustomersService],
 })
 export class CustomersModule {}
