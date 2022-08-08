@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
-import { Customer, CustomerDocument } from 'src/schemas/customer.schema';
+import { Customer, CustomerDocument } from '../schemas/customer.schema';
 import { CreateCustomersDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 
@@ -13,12 +12,7 @@ export class CustomersService {
   ) {}
 
   async create(customer: CreateCustomersDto) {
-    const customers = {
-      id: uuidv4(),
-      document: customer.document,
-      name: customer.name,
-    };
-    const createdCustomer = new this.customerModel(customers);
+    const createdCustomer = new this.customerModel(customer);
     return await createdCustomer.save();
   }
 
@@ -35,6 +29,6 @@ export class CustomersService {
   }
 
   async destroy(id: string) {
-    return await this.customerModel.deleteOne({ id: id }).exec();
+    return await this.customerModel.deleteOne({ _id: id }).exec();
   }
 }

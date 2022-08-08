@@ -11,7 +11,6 @@ import {
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
-import { RolesGuard } from '../auth/roles.guard.auth';
 import { CustomersService } from './customers.service';
 import { CreateCustomersDto as CreateCustomersDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -23,14 +22,15 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Customers } from './customers';
-import { CustomerSwagger } from 'src/swagger/customer.swagger';
-import { BadRequestSwagger } from 'src/helpers/swagger/bad-request.swagger';
-import { ForbbidenResourceSwagger } from 'src/helpers/swagger/forbidden-resource.swagger';
-import { NotFoundSwagger } from 'src/helpers/swagger/not-found.swagger';
+import { CustomerSwagger } from '../swagger/customer.swagger';
+import { BadRequestSwagger } from '../helpers/swagger/bad-request.swagger';
+import { ForbbidenResourceSwagger } from '../helpers/swagger/forbidden-resource.swagger';
+import { NotFoundSwagger } from '../helpers/swagger/not-found.swagger';
+import { RolesGuard } from '../auth/roles.guard.auth';
 
 @Controller('customers')
 @ApiBearerAuth()
-// @UseGuards(RolesGuard)
+@UseGuards(RolesGuard)
 @ApiTags('Customers')
 export class CustomersController {
   constructor(private readonly customerService: CustomersService) {}
